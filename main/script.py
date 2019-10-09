@@ -131,11 +131,14 @@ def main():
         main_result_page_parser(p)
     print('All Done!')
     print(str(len(output)) + ' results found!')
-    create_output_file()
+    create_output_file(root)
 
 
-def create_output_file():
-    filename = 'ebay_search_output.csv'
+def create_output_file(keyword_url):
+    local_page = requests.get(keyword_url)
+    local_soup = BeautifulSoup(local_page.content, 'html.parser')
+    keyword = local_soup.find('span', {"class": "kwcat"}).b.contents[0]
+    filename = keyword+'.csv'
     with open(filename, 'w', newline='') as f:
         w = csv.DictWriter(f, fieldnames=['itemURL', 'itemTitle', 'itemPrice', 'itemShippingCost', 'itemRatings',
                                           'itemFormat', 'itemsSold', 'itemAvailability', 'itemCondition'])
@@ -143,6 +146,5 @@ def create_output_file():
         for item in output:
             w.writerow(item)
     print('File successfully created! ')
-
 
 main()  # starts the parser
